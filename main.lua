@@ -49,8 +49,7 @@ function particle_update(particle, i, dt)
     destroy_me = true
   elseif math.abs(particle.distance - shield.radius) < PARTICLE_RADIUS then
 
-    -- local normalized = particle.direction - shield.direction
-    local normalized = particle.direction
+    local normalized = particle.direction + shield.direction
     while normalized < 0 do
       normalized = twopi + normalized
     end
@@ -86,16 +85,12 @@ function love.update(dt)
   assert(shield.direction >= 0)
   assert(shield.direction < twopi)
 
-  -- if #particles < now then
-    -- table.insert(particles, {
-    --   direction = math.random(0, twopi),
-    --   distance = .75
-    -- })
+  if #particles < now then
     table.insert(particles, {
-      direction = (now * 10) % twopi,
+      direction = math.random(0, twopi),
       distance = .75
     })
-  -- end
+  end
 
   for i, particle in ipairs(particles) do
     particle_update(particle, i, dt)
