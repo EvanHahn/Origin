@@ -40,3 +40,17 @@ misrepresented as being the original software.
 
 3. This notice may not be removed or altered from any source
 distribution.
+
+* * * * * * * * * * * *
+
+Explosion sound effect made by Amon (www.amon.co), licensed under a Creative
+Commons Attribution-Share Alike 3.0 license.
+
+* * * * * * * * * * * *
+
+"Blam" music by DST. Licensed under a Creative Commons Attribution 3.0
+Unported license. http://www.nosoapradio.us
+
+* * * * * * * * * * * *
+
+"laser-3" and "laserd" by Dravenx. http://www.dravenxgames.com
