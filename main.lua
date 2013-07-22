@@ -11,12 +11,15 @@ function love.load()
   PARTICLE_SPEED = .2 -- as % of screen size
   PARTICLE_DAMAGE = .05
 
+  pi = math.pi
+  twopi = math.pi * 2
+
   heart = {
     health = 1
   }
 
   shield = {
-    holes = 2,
+    holes = 3,
     hole_percentage = .5, -- % of total holes, not per hole
     radius = .2, -- as % of screen size
     direction = 0
@@ -32,6 +35,39 @@ function love.load()
 
 end
 
+function particle_update(particle, i, dt)
+
+  assert(particle.direction >= 0)
+  assert(particle.direction < twopi)
+
+  particle.distance = particle.distance - (PARTICLE_SPEED * dt)
+
+  local destroy_me = false
+
+  if particle.distance < 0 then
+    heart.health = heart.health - PARTICLE_DAMAGE
+    destroy_me = true
+  elseif math.abs(particle.distance - shield.radius) < PARTICLE_RADIUS then
+
+    -- local normalized = particle.direction - shield.direction
+    local normalized = particle.direction
+    while normalized < 0 do
+      normalized = twopi + normalized
+    end
+    normalized = normalized % twopi
+    assert(normalized >= 0)
+    assert(normalized < twopi)
+
+    normalized = normalized % (twopi / shield.holes)
+
+    destroy_me = normalized > (twopi * shield.hole_percentage / shield.holes)
+
+  end
+
+  if destroy_me then table.remove(particles, i) end
+
+end
+
 function love.update(dt)
 
   local now = os.clock()
@@ -42,27 +78,31 @@ function love.update(dt)
     shield.direction = shield.direction + .08
   end
 
-  -- TODO: make some kind of function for this
-  table.insert(particles, {
-    direction = math.random(0, math.pi * 2),
-    distance = .75
-  })
+  while shield.direction < 0 do
+    shield.direction = twopi + shield.direction
+  end
+  shield.direction = shield.direction % twopi
+
+  assert(shield.direction >= 0)
+  assert(shield.direction < twopi)
+
+  -- if #particles < now then
+    -- table.insert(particles, {
+    --   direction = math.random(0, twopi),
+    --   distance = .75
+    -- })
+    table.insert(particles, {
+      direction = (now * 10) % twopi,
+      distance = .75
+    })
+  -- end
 
   for i, particle in ipairs(particles) do
-    particle.distance = particle.distance - (PARTICLE_SPEED * dt)
-    local destroy_me = false
-    if particle.distance < 0 then
-      heart.health = heart.health - PARTICLE_DAMAGE
-      destroy_me = true
-    elseif particle.distance < shield.radius then
-      -- TODO: am i even in the shield area?
-      -- TODO: destroy me if the shield hits me
-    end
-    if destroy_me then table.remove(particles, i) end
+    particle_update(particle, i, dt)
   end
 
   if heart.health <= 0 then
-    -- TODO: you died
+    heart.health = 0
   end
 
 end
@@ -71,8 +111,8 @@ function love.draw()
 
   local now = os.clock()
 
-  local solid_size = (math.pi * 2) * (1 - shield.hole_percentage) / shield.holes
-  local hole_size = (math.pi * 2) * shield.hole_percentage / shield.holes
+  local solid_size = twopi * (1 - shield.hole_percentage) / shield.holes
+  local hole_size = twopi * shield.hole_percentage / shield.holes
   local shield_radius = shield.radius * screen_size
   love.graphics.setColor(COLORS.shield)
   for i = 0, shield.holes, 1 do
@@ -95,6 +135,6 @@ function love.draw()
 
   local heart_radius = math.abs(math.sin(now * 20)) * (screen_size * .02) + (screen_size * .02)
   love.graphics.setColor(COLORS.heart)
-  love.graphics.arc('fill', center_x, center_y, heart_radius, 0, math.pi * 2 * heart.health)
+  love.graphics.arc('fill', center_x, center_y, heart_radius, 0, twopi * heart.health)
 
 end
