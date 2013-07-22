@@ -3,8 +3,9 @@ function love.conf(t)
   t.title = 'Origin'
   t.author = 'Evan Hahn'
 
-  t.screen.width = 800
-  t.screen.height = 800
+  local size = 800
+  t.screen.width = size
+  t.screen.height = size
   t.screen.fullscreen = false
 
   t.modules.joystick = false
