@@ -25,6 +25,8 @@ function love.load()
   particles = {}
 
   screen_size = 400 -- TODO
+  center_x = screen_size / 2
+  center_y = screen_size / 2
 
   love.graphics.setBackgroundColor(COLORS.background)
 
@@ -67,8 +69,6 @@ end
 
 function love.draw()
 
-  local center_x = screen_size / 2
-  local center_y = screen_size / 2
   local now = os.clock()
 
   local solid_size = (math.pi * 2) * (1 - shield.hole_percentage) / shield.holes
