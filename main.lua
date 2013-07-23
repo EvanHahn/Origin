@@ -22,6 +22,8 @@ function love.load()
   PARTICLE_SPEED = .2 -- as % of screen size
   PARTICLE_DAMAGE = .05
 
+  SHIELD_SPEED = 5
+
   pi = math.pi
   twopi = math.pi * 2
 
@@ -79,7 +81,7 @@ function particle_update(particle, i, dt)
       set_background(COLORS.background)
     end)
 
-  elseif (math.abs(particle.distance - shield.radius) < PARTICLE_RADIUS) and (heart.health > 0) then
+  elseif (math.abs(particle.distance - shield.radius) < .001) and (heart.health > 0) then
 
     local normalized = particle.direction + shield.direction
     while normalized < 0 do
@@ -101,16 +103,18 @@ function particle_update(particle, i, dt)
 
     table.remove(particles, i)
 
-    points = points + 1
-    if points == 5 then
-      love.audio.stop(SOUNDS.powerup)
-      love.audio.play(SOUNDS.powerup)
-      shield.holes = 2
-    end
-    if points == 20 then
-      love.audio.stop(SOUNDS.powerup)
-      love.audio.play(SOUNDS.powerup)
-      shield.holes = 3
+    if heart.health > 0 then
+      points = points + 1
+      if points == 5 then
+        love.audio.stop(SOUNDS.powerup)
+        love.audio.play(SOUNDS.powerup)
+        shield.holes = 2
+      end
+      if points == 20 then
+        love.audio.stop(SOUNDS.powerup)
+        love.audio.play(SOUNDS.powerup)
+        shield.holes = 3
+      end
     end
 
   end
@@ -124,9 +128,9 @@ function love.update(dt)
   timer.update(dt)
 
   if love.keyboard.isDown('left') then
-    shield.direction = shield.direction - .08
+    shield.direction = shield.direction - (SHIELD_SPEED * dt)
   elseif love.keyboard.isDown('right') then
-    shield.direction = shield.direction + .08
+    shield.direction = shield.direction + (SHIELD_SPEED * dt)
   end
 
   while shield.direction < 0 do
@@ -196,6 +200,11 @@ function love.draw()
     love.graphics.circle('fill', particle_x, particle_y, particle_size * 1.3, 50)
     love.graphics.setColor(math.random(0, 255), math.random(0, 255), math.random(0, 255))
     love.graphics.circle('fill', particle_x, particle_y, particle_size, 50)
+  end
+
+  if heart.health <= 0 then
+    love.graphics.setColor(COLORS.heart)
+    love.graphics.print('Score: ' .. points, 10, 10)
   end
 
 end
